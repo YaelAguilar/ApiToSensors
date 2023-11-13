@@ -19,5 +19,5 @@ def temperature():
     return"Temperature: 37°C"
 
 @app.get("/physicactivity")
-def physicactivity():
+def physicctivity():
     return "PhysicActivity: high"
