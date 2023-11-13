@@ -32,8 +32,6 @@ def enviar_lecturas():
         channel.exchange_declare(exchange='PulseSensor', exchange_type='fanout', durable=True)
         channel.exchange_declare(exchange='ADXL345', exchange_type='direct', durable=True)
 
-        connection.start()
-
         while True:
             lectura_max30102 = simular_MAX30102()
             lectura_mlx90614 = simular_MLX90614()
