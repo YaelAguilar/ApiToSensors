@@ -23,36 +23,40 @@ def simular_ADXL345():
 def enviar_lecturas():
     credentials = pika.PlainCredentials('zenAdmin', 'pulsepasswrd_')  # Reemplaza con tus credenciales reales
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', credentials=credentials))
-    channel = connection.channel()
 
-    channel.exchange_declare(exchange='MAX30102', exchange_type='fanout', durable=True)
-    channel.exchange_declare(exchange='MLX90614', exchange_type='fanout', durable=True)
-    channel.exchange_declare(exchange='PulseSensor', exchange_type='fanout', durable=True)
-    channel.exchange_declare(exchange='ADXL345', exchange_type='direct', durable=True)
+    try: 
+        channel = connection.channel()
 
-    while True:
-        lectura_max30102 = simular_MAX30102()
-        lectura_mlx90614 = simular_MLX90614()
-        lectura_pulse = simular_PulseSensor()
-        lectura_adxl = simular_ADXL345()
+        channel.exchange_declare(exchange='MAX30102', exchange_type='fanout', durable=True)
+        channel.exchange_declare(exchange='MLX90614', exchange_type='fanout', durable=True)
+        channel.exchange_declare(exchange='PulseSensor', exchange_type='fanout', durable=True)
+        channel.exchange_declare(exchange='ADXL345', exchange_type='direct', durable=True)
 
-        channel.basic_publish(exchange='MAX30102', routing_key='', body=str(lectura_max30102))
-        channel.basic_publish(exchange='MLX90614', routing_key='', body=str(lectura_mlx90614))
-        channel.basic_publish(exchange='PulseSensor', routing_key='', body=str(lectura_pulse))
-        channel.basic_publish(exchange='ADXL345', routing_key='x', body=str(lectura_adxl[0]))
-        channel.basic_publish(exchange='ADXL345', routing_key='y', body=str(lectura_adxl[1]))
-        channel.basic_publish(exchange='ADXL345', routing_key='z', body=str(lectura_adxl[2]))
+        connection.start()
 
-        print(f"Enviado a MAX30102: Saturación de oxígeno: {lectura_max30102}%")
-        print(f"Enviado a MLX90614: Temperatura corporal: {lectura_mlx90614}°C")
-        print(f"Enviado a PulseSensor: Frecuencia cardiaca: {lectura_pulse} bpm")
-        print(f"Enviado a ADXL345: Lectura en el eje X: {lectura_adxl[0]}")
-        print(f"Enviado a ADXL345: Lectura en el eje Y: {lectura_adxl[1]}")
-        print(f"Enviado a ADXL345: Lectura en el eje Z: {lectura_adxl[2]}")
+        while True:
+            lectura_max30102 = simular_MAX30102()
+            lectura_mlx90614 = simular_MLX90614()
+            lectura_pulse = simular_PulseSensor()
+            lectura_adxl = simular_ADXL345()
 
-        time.sleep(1)
+            channel.basic_publish(exchange='MAX30102', routing_key='', body=str(lectura_max30102))
+            channel.basic_publish(exchange='MLX90614', routing_key='', body=str(lectura_mlx90614))
+            channel.basic_publish(exchange='PulseSensor', routing_key='', body=str(lectura_pulse))
+            channel.basic_publish(exchange='ADXL345', routing_key='x', body=str(lectura_adxl[0]))
+            channel.basic_publish(exchange='ADXL345', routing_key='y', body=str(lectura_adxl[1]))
+            channel.basic_publish(exchange='ADXL345', routing_key='z', body=str(lectura_adxl[2]))
 
-    connection.close()
+            print(f"Enviado a MAX30102: Saturación de oxígeno: {lectura_max30102}%")
+            print(f"Enviado a MLX90614: Temperatura corporal: {lectura_mlx90614}°C")
+            print(f"Enviado a PulseSensor: Frecuencia cardiaca: {lectura_pulse} bpm")
+            print(f"Enviado a ADXL345: Lectura en el eje X: {lectura_adxl[0]}")
+            print(f"Enviado a ADXL345: Lectura en el eje Y: {lectura_adxl[1]}")
+            print(f"Enviado a ADXL345: Lectura en el eje Z: {lectura_adxl[2]}")
+
+            time.sleep(1)
+    finally:
+        connection.close()
 
 if __name__ == '__main__':
     enviar_lecturas()
